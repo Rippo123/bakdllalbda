@@ -9,7 +9,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import Media, get_file_details, unpack_new_file_id
 from database.users_chats_db import db
 from info import CHANNELS, ADMINS, AUTH_CHANNEL, LOG_CHANNEL, PICS, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT, REQ
-from utils import get_settings, get_size, is_subscribed, save_group_settings, temp
+from utils import get_settings, get_size, is_subscribed, save_group_settings,  join_request, temp
 from database.connections_mdb import active_connection
 import re
 import json
@@ -63,7 +63,7 @@ async def start(client, message):
             parse_mode='html'
         )
         return
-    if AUTH_CHANNEL and not await is_subscribed(client, message):
+    if AUTH_CHANNEL and not await join_request(client, message):
         try:
             invite_link = await client.create_chat_invite_link(int(AUTH_CHANNEL))
         except ChatAdminRequired:
@@ -77,7 +77,7 @@ async def start(client, message):
             ]
         ]
 
-        if message.command[1] != "subscribe":
+        if message.command[1] != "join_request":
             kk, file_id = message.command[1].split("_", 1)
             pre = 'checksubp' if kk == 'filep' else 'checksub' 
             btn.append([InlineKeyboardButton("🔄 Try Again 👈 Tap me 🥰", callback_data=f"{pre}#{file_id}")])
